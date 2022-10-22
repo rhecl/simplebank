@@ -12,6 +12,7 @@ type Store struct {
 	db *sql.DB
 }
 
+// NewStore creates a new store
 func NewStore(db *sql.DB) *Store {
 	return &Store{
 		db:      db,
@@ -37,12 +38,14 @@ func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 	return tx.Commit()
 }
 
+// TransferTxParams contains the input parameters of the transfer transaction
 type TransferTxParams struct {
 	FromAccountID int64 `json:"from_account_id"`
 	ToAccountID   int64 `json:"to_account_id"`
 	Amount        int64 `json:"amount"`
 }
 
+// TransferTxResult is the result of the transfer transaction
 type TransferTxResult struct {
 	Transfer    Transfer `json:"transfer"`
 	FromAccount Account  `json:"from_account"`
@@ -51,6 +54,8 @@ type TransferTxResult struct {
 	ToEntry     Entry    `json:"to_entry"`
 }
 
+// TransferTx performs a money transfer from one account to the other.
+// It creates the transfer, add account entries, and update accounts' balance within a database transaction
 func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
